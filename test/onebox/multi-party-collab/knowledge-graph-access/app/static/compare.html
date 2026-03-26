@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Compare Knowledge Graph Views</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="https://unpkg.com/cytoscape@3.29.2/dist/cytoscape.min.js"></script>
+  <script src="/static/app.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Compare Sub A and Sub B Views</h1>
+    <p>Live side-by-side comparison of the fulfillment-platform integration scenario. Both parties can see the shared contract and failure signal, while each party sees only its own service implementation details.</p>
+  </header>
+  <main>
+    <div class="page-shell">
+      <section class="summary-panel">
+        <div class="badge">Hackathon Demo View</div>
+        <h2>What this comparison shows</h2>
+        <p class="subtle">The layouts are synchronized so the audience can visually compare both perspectives. Click a node in one graph to highlight the matching node in the other graph when present. Shared nodes represent the interface contract and cleanroom evidence; private nodes represent each subcontractor's own implementation assumptions.</p>
+        <div class="summary-grid">
+          <div class="summary-list">
+            <h3>Shared across both views</h3>
+            <ul data-compare="shared"></ul>
+          </div>
+          <div class="summary-list">
+            <h3>Only visible to Sub A</h3>
+            <ul data-compare="only-a"></ul>
+          </div>
+          <div class="summary-list">
+            <h3>Only visible to Sub B</h3>
+            <ul data-compare="only-b"></ul>
+          </div>
+        </div>
+        <p class="compare-note">Shared nodes use a darker outline. Private nodes remain visible only in the owning subcontractor's panel.</p>
+      </section>
+      <div class="compare-grid">
+        <div class="card">
+          <h2 id="title-a">Sub A</h2>
+          <div class="stats-grid" data-stats-for="graph-a">
+            <div class="stat">
+              <div class="stat-label">Viewer</div>
+              <div class="stat-value" data-role="viewer">-</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Visible nodes</div>
+              <div class="stat-value" data-role="nodes">-</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Visible edges</div>
+              <div class="stat-value" data-role="edges">-</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Shared nodes</div>
+              <div class="stat-value" data-role="shared">-</div>
+            </div>
+          </div>
+          <div id="graph-a" class="graph-container"></div>
+        </div>
+        <div class="card">
+          <h2 id="title-b">Sub B</h2>
+          <div class="stats-grid" data-stats-for="graph-b">
+            <div class="stat">
+              <div class="stat-label">Viewer</div>
+              <div class="stat-value" data-role="viewer">-</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Visible nodes</div>
+              <div class="stat-value" data-role="nodes">-</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Visible edges</div>
+              <div class="stat-value" data-role="edges">-</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Shared nodes</div>
+              <div class="stat-value" data-role="shared">-</div>
+            </div>
+          </div>
+          <div id="graph-b" class="graph-container"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script>
+    loadComparePage();
+  </script>
+</body>
+</html>

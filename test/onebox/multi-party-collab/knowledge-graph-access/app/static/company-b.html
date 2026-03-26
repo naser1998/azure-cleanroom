@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Company B Graph View</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="https://unpkg.com/cytoscape@3.29.2/dist/cytoscape.min.js"></script>
+  <script src="/static/app.js"></script>
+</head>
+<body>
+  <header>
+    <h1 id="title">Knowledge Graph View</h1>
+    <p>Sub B can inspect its shipping-service implementation assumptions alongside the shared interface contract and the cleanroom integration failure signal.</p>
+  </header>
+  <main>
+    <div class="page-shell">
+      <section class="hero-card">
+        <div class="badge">Viewer: Sub B / Shipping Service</div>
+        <div class="legend">
+          <span><i style="background:#3b82f6"></i>Shared scenario context</span>
+          <span><i style="background:#8b5cf6"></i>Shared contract / field</span>
+          <span><i style="background:#f59e0b"></i>Sub B private details</span>
+          <span><i style="background:#dc2626"></i>Integration failure</span>
+        </div>
+        <div class="stats-grid" data-stats-for="graph">
+          <div class="stat">
+            <div class="stat-label">Viewer</div>
+            <div class="stat-value" data-role="viewer">-</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Visible nodes</div>
+            <div class="stat-value" data-role="nodes">-</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Visible edges</div>
+            <div class="stat-value" data-role="edges">-</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Shared nodes</div>
+            <div class="stat-value" data-role="shared">-</div>
+          </div>
+        </div>
+      </section>
+      <section class="card">
+        <div id="graph" class="graph-container"></div>
+      </section>
+    </div>
+  </main>
+  <script>
+    loadGraph('company-b', 'graph', 'title');
+  </script>
+</body>
+</html>

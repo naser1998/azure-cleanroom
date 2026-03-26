@@ -1,0 +1,35 @@
+- Built a two-party collaboration demo where Sub A and Sub B each see a controlled view of the same integration scenario.
+
+- Modeled the scenario as an interactive knowledge graph showing:
+  - shared contract context
+  - each subcontractor’s private implementation details
+  - the shared integration failure signal
+
+- Kept participant separation by returning:
+  - shared nodes
+  - viewer-owned private nodes
+  - excluding the other participant’s private nodes
+
+- Used the demo to represent a realistic confidential integration testing use case:
+  - both parties need joint validation
+  - neither wants to reveal proprietary implementation details
+
+- Framed the scenario around core Azure Confidential Clean Rooms ideas:
+  - controlled multi-party collaboration
+  - governed execution of a shared workload
+  - participant-specific outputs instead of unrestricted data sharing
+
+- Incorporated cleanroom-relevant platform concepts in the overall flow:
+  - governance and contract setup
+  - identity-backed access
+  - secure telemetry and logging paths
+  - confidential workload-style execution
+
+- Improved the demo UX with:
+  - clearer scenario-specific data
+  - side-by-side comparison view
+  - synchronized graph interaction
+  - easier-to-read color coding for shared vs private context
+
+- Demonstrated the main value proposition of Azure Confidential Clean Rooms:
+  - collaborate on a shared problem without exposing all underlying private assets to every participant

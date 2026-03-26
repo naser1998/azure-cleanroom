@@ -143,7 +143,11 @@ function Setup-OIDC-Issuer-StorageAccount {
     --auth-mode login
 
   $ccfEndpoint = (az cleanroom governance client show --name $governanceClient | ConvertFrom-Json)
-  $url = "$($ccfEndpoint.ccfEndpoint)/app/oidc/keys"
+  $hostReachableCcfEndpoint = $ccfEndpoint.ccfEndpoint
+  if ($IsLinux) {
+    $hostReachableCcfEndpoint = $hostReachableCcfEndpoint -replace "host\.docker\.internal", "localhost"
+  }
+  $url = "$hostReachableCcfEndpoint/app/oidc/keys"
   curl -s -k $url | jq > $outDir/jwks.json
 
   az storage blob upload `

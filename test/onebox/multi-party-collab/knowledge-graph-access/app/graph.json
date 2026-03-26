@@ -1,0 +1,40 @@
+{
+  "nodes": [
+    {"id": "prime", "label": "Prime Contractor", "type": "actor", "tags": ["shared"]},
+    {"id": "platform", "label": "Fulfillment Platform", "type": "service", "tags": ["shared"]},
+    {"id": "spec", "label": "Shared Interface Spec", "type": "contract", "tags": ["shared"]},
+    {"id": "field", "label": "reserved_until field", "type": "field", "tags": ["shared"]},
+    {"id": "integration-test", "label": "Integration Test", "type": "test", "tags": ["shared"]},
+    {"id": "failure", "label": "reservation_expired", "type": "error", "tags": ["shared"]},
+
+    {"id": "sub-a", "label": "Sub A: Inventory Service", "type": "service", "tags": ["company-a"]},
+    {"id": "inventory-endpoint", "label": "GET /inventory/check", "type": "api", "tags": ["company-a"]},
+    {"id": "offset-format", "label": "Offset timestamp (-04:00)", "type": "format", "tags": ["company-a"]},
+    {"id": "unit-a", "label": "Sub A unit tests pass", "type": "test", "tags": ["company-a"]},
+
+    {"id": "sub-b", "label": "Sub B: Shipping Service", "type": "service", "tags": ["company-b"]},
+    {"id": "shipping-endpoint", "label": "POST /shipment/quote", "type": "api", "tags": ["company-b"]},
+    {"id": "strict-z", "label": "Strict parser expects Z", "type": "format", "tags": ["company-b"]},
+    {"id": "unit-b", "label": "Sub B unit tests pass", "type": "test", "tags": ["company-b"]}
+  ],
+  "edges": [
+    {"source": "prime", "target": "platform", "label": "builds"},
+    {"source": "platform", "target": "spec", "label": "defines"},
+    {"source": "spec", "target": "field", "label": "includes"},
+    {"source": "integration-test", "target": "failure", "label": "reveals"},
+
+    {"source": "prime", "target": "sub-a", "label": "contracts"},
+    {"source": "sub-a", "target": "inventory-endpoint", "label": "exposes"},
+    {"source": "inventory-endpoint", "target": "field", "label": "returns"},
+    {"source": "inventory-endpoint", "target": "offset-format", "label": "formats as"},
+    {"source": "sub-a", "target": "unit-a", "label": "validates"},
+    {"source": "offset-format", "target": "failure", "label": "triggers"},
+
+    {"source": "prime", "target": "sub-b", "label": "contracts"},
+    {"source": "sub-b", "target": "shipping-endpoint", "label": "exposes"},
+    {"source": "shipping-endpoint", "target": "field", "label": "parses"},
+    {"source": "shipping-endpoint", "target": "strict-z", "label": "expects"},
+    {"source": "sub-b", "target": "unit-b", "label": "validates"},
+    {"source": "strict-z", "target": "failure", "label": "causes"}
+  ]
+}

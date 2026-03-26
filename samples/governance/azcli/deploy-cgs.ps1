@@ -149,6 +149,7 @@ if ($ccfEndpoint -eq "") {
             # Creating the initial member identity certificate to add into the consortium.
             $PSNativeCommandUseErrorActionPreference = $false
             az cleanroom governance member keygenerator-sh | `
+                tr -d '\r' | `
                 bash -s -- --name $initialMemberName --gen-enc-key --out $sandbox_common
         }
     }
@@ -221,14 +222,22 @@ if ($ccfEndpoint -eq "") {
 
     $ccfEndpoint = ""
     $agentEndpoint = ""
-    if ($env:CODESPACES -ne "true" -and $env:GITHUB_ACTIONS -ne "true") {
+    $clientDeployCcfEndpoint = ""
+    if ($IsLinux) {
+        $ccfEndpoint = "https://localhost:$ccfPort"
+        $agentEndpoint = "http://localhost:$agentPort"
+        $clientDeployCcfEndpoint = "https://host.docker.internal:$ccfPort"
+    }
+    elseif ($env:CODESPACES -ne "true" -and $env:GITHUB_ACTIONS -ne "true") {
         $ccfEndpoint = "https://host.docker.internal:$ccfPort"
         $agentEndpoint = "http://host.docker.internal:$agentPort"
+        $clientDeployCcfEndpoint = $ccfEndpoint
     }
     else {
         # 172.17.0.1: https://stackoverflow.com/questions/48546124/what-is-the-linux-equivalent-of-host-docker-internal
         $ccfEndpoint = "https://172.17.0.1:$ccfPort"
         $agentEndpoint = "http://172.17.0.1:$agentPort"
+        $clientDeployCcfEndpoint = $ccfEndpoint
     }
 
     @"
@@ -373,14 +382,14 @@ elseif ($registry -eq "acr") {
 # APIs via it.
 if (Test-Path $sandbox_common/${initialMemberName}_cert.id) {
     az cleanroom governance client deploy `
-        --ccf-endpoint $ccfEndpoint `
+        --ccf-endpoint $clientDeployCcfEndpoint `
         --signing-cert-id $sandbox_common/${initialMemberName}_cert.id `
         --service-cert $sandbox_common/service_cert.pem `
         --name $projectName
 }
 else {
     az cleanroom governance client deploy `
-        --ccf-endpoint $ccfEndpoint `
+        --ccf-endpoint $clientDeployCcfEndpoint `
         --signing-key $sandbox_common/${initialMemberName}_privk.pem `
         --signing-cert $sandbox_common/${initialMemberName}_cert.pem `
         --service-cert $sandbox_common/service_cert.pem `

@@ -968,20 +968,27 @@ def load_arguments(self, _):
 
     with self.argument_context("cleanroom config wrap-deks") as c:
         c.argument(
-            "contract_id",
-            help="Contract Id",
-            options_list=["--contract-id"],
+        "contract_id",
+        help="Contract Id",
+        options_list=["--contract-id"],
         )
         c.argument(
-            "gov_client_name",
-            help="Name of the client instance",
-            options_list=["--governance-client"],
+        "key_release_mode",
+        arg_type=get_enum_type(["strict", "allow-all"]),
+        help="Key release policy mode to use when creating KEKs. Use 'allow-all' for local virtual onebox scenarios.",
+        options_list=["--key-release-mode"],
         )
         c.argument(
-            "secretstore_config_file",
-            help="The configuration file storing information about the secret store.",
-            options_list=["--secretstore-config"],
+        "gov_client_name",
+        help="Name of the client instance",
+        options_list=["--governance-client"],
         )
+        c.argument(
+        "secretstore_config_file",
+        help="The configuration file storing information about the secret store.",
+        options_list=["--secretstore-config"],
+        )
+
 
     with self.argument_context("cleanroom config wrap-secret") as c:
         c.argument(

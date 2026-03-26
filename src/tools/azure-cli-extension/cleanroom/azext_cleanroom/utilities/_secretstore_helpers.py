@@ -28,7 +28,7 @@ class ISecretStore(ABC):
         self,
         secret_name: str,
         generate_secret: Callable,
-        security_policy: str | None = None,
+        security_policy: str | dict | None = None,
     ) -> bytes:
         pass
 
@@ -45,7 +45,7 @@ class LocalSecretStore(ISecretStore):
         self,
         secret_name: str,
         generate_secret: Callable,
-        security_policy: str | None = None,
+        security_policy: str | dict | None = None,
     ) -> bytes:
         from ._azcli_helpers import logger
 
@@ -81,7 +81,7 @@ class AzureSecureSecretStore(ISecretStore):
         self,
         secret_name: str,
         generate_secret: Callable,
-        security_policy: str | None = None,
+        security_policy: str | dict | None = None,
     ) -> bytes:
         from cryptography.hazmat.primitives import serialization
         from cryptography.hazmat.primitives.asymmetric import rsa
@@ -117,25 +117,32 @@ class AzureSecureSecretStore(ISecretStore):
             maa_url = json.loads(base64.b64decode(self._entry.configuration).decode())[
                 "authority"
             ]
-            skr_policy = {
-                "anyOf": [
-                    {
-                        "allOf": [
-                            {
-                                "claim": "x-ms-sevsnpvm-hostdata",
-                                "equals": security_policy,
-                            },
-                            {
-                                "claim": "x-ms-compliance-status",
-                                "equals": "azure-compliant-uvm",
-                            },
-                            {"claim": "x-ms-attestation-type", "equals": "sevsnpvm"},
-                        ],
-                        "authority": maa_url,
-                    }
-                ],
-                "version": "1.0.0",
-            }
+            if isinstance(security_policy, dict):
+                skr_policy = security_policy
+            else:
+                skr_policy = {
+                    "anyOf": [
+                        {
+                            "allOf": [
+                                {
+                                    "claim": "x-ms-sevsnpvm-hostdata",
+                                    "equals": security_policy,
+                                },
+                                {
+                                    "claim": "x-ms-compliance-status",
+                                    "equals": "azure-compliant-uvm",
+                                },
+                                {
+                                    "claim": "x-ms-attestation-type",
+                                    "equals": "sevsnpvm",
+                                },
+                            ],
+                            "authority": maa_url,
+                        }
+                    ],
+                    "version": "1.0.0",
+                }
+
             with open(skr_file_path, "w") as f:
                 json.dump(skr_policy, f, indent=2)
 

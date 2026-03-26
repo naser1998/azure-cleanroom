@@ -1716,29 +1716,31 @@ def config_create_kek_policy_cmd(
 
 
 def config_wrap_deks_cmd(
-    cmd,
-    cleanroom_config_file,
-    contract_id,
-    gov_client_name="",
-    datastore_config_file=DataStoreConfiguration.default_datastore_config_file(),
-    secretstore_config_file=SecretStoreConfiguration.default_secretstore_config_file(),
+cmd,
+cleanroom_config_file,
+contract_id,
+gov_client_name="",
+datastore_config_file=DataStoreConfiguration.default_datastore_config_file(),
+secretstore_config_file=SecretStoreConfiguration.default_secretstore_config_file(),
+key_release_mode="strict",
 ):
     if gov_client_name != "":
         # Create the KEK first that will be used to wrap the DEKs.
         create_kek_via_governance(
-            cmd,
-            cleanroom_config_file,
-            secretstore_config_file,
-            contract_id,
-            gov_client_name,
-        )
-
-    config_wrap_deks(
         cmd,
         cleanroom_config_file,
-        datastore_config_file,
         secretstore_config_file,
+        contract_id,
+        gov_client_name,
+        key_release_mode,
+        )
+    config_wrap_deks(
+    cmd,
+    cleanroom_config_file,
+    datastore_config_file,
+    secretstore_config_file,
     )
+
 
 
 def config_wrap_secret_cmd(
@@ -2164,24 +2166,58 @@ def config_wrap_deks(
 
 
 def create_kek_via_governance(
-    cmd,
-    cleanroom_config_file,
-    secretstore_config_file,
-    contract_id,
-    gov_client_name,
+cmd,
+cleanroom_config_file,
+secretstore_config_file,
+contract_id,
+gov_client_name,
+key_release_mode="strict",
 ):
+    from .utilities._configuration_helpers import read_cleanroom_spec_internal
+
     cl_policy = governance_deployment_policy_show_cmd(cmd, contract_id, gov_client_name)
     if not "policy" in cl_policy or not "x-ms-sevsnpvm-hostdata" in cl_policy["policy"]:
         raise CLIError(
-            f"No clean room policy found under contract '{contract_id}'. Check "
-            + "--contract-id parameter is correct and that a policy proposal for the contract has been accepted."
+        f"No clean room policy found under contract '{contract_id}'. Check "
+        + "--contract-id parameter is correct and that a policy proposal for the contract has been accepted."
         )
 
+    key_release_policy = cl_policy["policy"]["x-ms-sevsnpvm-hostdata"][0]
+    if key_release_mode == "allow-all":
+        spec = read_cleanroom_spec_internal(cleanroom_config_file)
+        authority = None
+        for ds_entry in spec.datasources + spec.datasinks:
+            if not ds_entry.protection.encryptionSecrets:
+                continue
+            authority = json.loads(
+            base64.b64decode(
+            ds_entry.protection.encryptionSecrets.kek.secret.backingResource.provider.configuration
+            ).decode()
+            )["authority"]
+            break
+        if authority is None:
+            raise CLIError("Failed to determine attestation authority for KEK release policy.")
+        key_release_policy = {
+"anyOf": [
+{
+"allOf": [
+{
+"claim": "x-ms-sevsnpvm-hostdata",
+"equals": cl_policy["policy"]["x-ms-sevsnpvm-hostdata"][0],
+}
+],
+"authority": authority,
+}
+],
+"version": "1.0.0",
+}
+
     config_create_kek(
-        cleanroom_config_file,
-        secretstore_config_file,
-        cl_policy["policy"]["x-ms-sevsnpvm-hostdata"][0],
-    )
+    cleanroom_config_file,
+    secretstore_config_file,
+    key_release_policy,
+)
+
 
 
 def config_create_kek(
